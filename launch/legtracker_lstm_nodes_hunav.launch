@@ -1,0 +1,80 @@
+<launch>
+
+    <arg name="robot_id" default="$(optenv ROBOT_ID moca_red)"/>
+    <arg name="laser_scan_max_distance_range" default="30.0"/> <!-- same as obstacle_range ROS parameter -->
+
+    <!-- MAP_LASER_FILTER node (to exclude static map from the laserscan) -->
+    <arg name="map_laser_filter_scan_topic" value="base_scan_filter"/>
+    <include file="$(find leg_detector)/launch/map_laser_filter.launch">
+        <arg name="base_scan_filter_topic" value="$(eval arg('robot_id') + '/' + 'base_scan_filter' )"/>
+        <arg name="scan_topic"             value="$(eval arg('robot_id') + '/' + 'front_laser/scan' )"/>
+        <arg name="map_topic"              value="$(eval arg('robot_id') + '/' + 'map' )"/>
+        <arg name="mobile_base" value="$(arg robot_id)"/>
+        <arg name="laser_scan_max_distance_range" value="$(arg laser_scan_max_distance_range)"/>
+    </include>
+
+    <!-- angusleigh/leg_tracker -->
+    <include file="$(find leg_tracker)/launch/joint_leg_tracker.launch">
+        <arg name="scan_topic" value="$(eval arg('robot_id') + '/' + 'base_scan_filter' )"/>
+        <!-- <arg name="scan_topic" value="$(arg map_laser_filter_scan_topic)"/> -->
+        <arg name="fixed_frame" value="$(arg robot_id)_odom"/>
+    </include>
+
+    <!-- people_tracking_filter (not working) -->
+    <!-- <include file="$(find people_tracking_filter)/launch/filter.launch"/> -->
+
+    <!-- HRII_LEG_TRACKER and LSTM_NODE (to predict a single person's trajectory)-->
+    <!-- <node pkg="hrii_leg_tracker" type="legs_tracker.py" name="legs_tracker" output="screen">
+        <param name="scan_topic" value="$(arg map_laser_filter_scan_topic)"/>
+        <param name="mobile_base" value="$(arg robot_id)"/>
+    </node>
+    <node pkg="hrii_person_tracker" type="lstm_node.py" name="lstm_node" output="screen">
+        <param name="mobile_base" value="$(arg robot_id)"/>
+    </node> -->
+
+
+    <!-- wg-perception/people/tree/noetic/leg_detector (alternative to legs_tracker) -->
+    <!-- <include file="$(find leg_detector)/launch/leg_detector.launch">
+        <arg name="scan_topic" value="$(arg map_laser_filter_scan_topic)"/>
+        <arg name="odom_frame" value="$(arg robot_id)_odom"/>
+    </include> -->
+
+    <!-- LSTM_NODE_ARRAY (to predict multiple people trajectories) -->
+    <arg name="neural_network_model" default="lstm"/>
+    <arg name="interaction_module"   default="vanilla"/>
+
+    <node pkg="hrii_person_tracker" type="lstm_node_array_angusleigh_leg_tracker.py" name="lstm_node_array"
+          args="--neural_network_model $(arg neural_network_model)
+                --interaction_module $(arg interaction_module)"
+          output="screen">
+        <param name="mobile_base" value="$(arg robot_id)"/>
+        <!-- <param name="lstm_node_loop_period" value="1.0"/> -->
+    </node>
+    <!-- lstm, sgan, vae -->
+    <!-- vanilla, occupancy, directional, social, hiddenstatemlp, nn, attentionmlp, nn_lstm, traj_pool -->
+    <!-- <node pkg="hrii_person_tracker" type="cmd_vel_timestamps_publisher.py" name="cmd_vel_timestamps_publisher"/> -->
+
+    <!-- FOOTPRINT PUBLISHER: it's needed to not intersect predicted trajectory with the robot footprint.
+        I use a workaround node 'footprint_publisher' because lstm_layers_array cannot subscribe directly to footprint topic for some reason -->
+    <!-- <node pkg="hrii_person_tracker" type="footprint_publisher_node" name="footprint_publisher_node" output="screen"/> -->
+
+    <!-- Control Gazebo Actors in path with gazebo_ros_actor_plugin -->
+    <!-- <node pkg="gazebo_ros_actor_plugin" type="path_publisher.py" name="path_publisher_node"/> -->
+
+    <!-- COSTMAP LAYER MANAGER: switch between local costmap ObstacleLayer and LstmLayer -->
+    <!-- <node pkg="hrii_person_tracker" type="local_costmap_reconfigurer.py" name="local_costmap_reconfigurer" output="screen"/> -->
+    
+    <!-- HUNAV_SIM -->
+    <!-- robot_states Agent.msg and human_states Agents.msg publishers -->
+    <!-- <node pkg="hunav_evaluator" type="hunav_human_states_node_riskrrt.py" name="hunav_human_states_node"/> -->
+    <!-- <node pkg="hunav_evaluator" type="hunav_robot_state_node_riskrrt.py" name="hunav_robot_state_node"/> -->
+    
+    <!-- <node pkg="hunav_evaluator" type="hunav_robot_state_node.py" name="hunav_robot_state_node" ns="moca_red">
+      <remap from="/amcl_pose" to="/moca_red/amcl_pose" />
+      <remap from="/odom"      to="/moca_red/robotnik_base_control/odom" />
+      <remap from="/move_base_simple/goal" to="/moca_red/move_base_simple/goal" />
+    </node> -->
+
+    <!-- hunav_evaluator.launch must be run in a terminal different from the main one -->
+
+</launch>

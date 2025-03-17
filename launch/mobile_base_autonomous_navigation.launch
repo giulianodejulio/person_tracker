@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- General parameters -->
+    <arg name="interface_type" default="$(optenv INTERFACE_TYPE SIMULATION)"/>
+    
+    <!-- General simulation parameters -->
+    <arg name="launch_gazebo_gui" default="true"/>
+    <arg name="launch_gazebo_paused" default="true"/>
+    <arg name="launch_gazebo_world" default="true"/>
+    <arg name="gazebo_world" default="$(find gazebo_ros)/worlds/empty.world"/>
+
+    <!-- General robot parameters -->
+    <!-- <arg name="robot_model" default="rb_kairos"/>  -->
+    <!-- <arg name="robot_id" default="$(optenv ROBOT_ID rbkairos)"/> -->
+    <arg name="robot_model" default="moca"/>
+    <arg name="robot_id" default="$(optenv ROBOT_ID moca_red)"/>
+
+    <arg name="robot_brand" default="$(arg robot_model)"/>
+    
+    <!-- rb_kairos -->
+    <!-- <arg name="arm_model" default="ur10e"/> -->
+    <!-- <arg name="arm_id" default="ur10e"/> -->
+
+    <!-- Robot simulation parameters -->
+    <!-- <arg name="connected_to" default="world"/> -->
+    <arg name="x_init_pose" default="-10" />
+    <arg name="y_init_pose" default="0" />
+    <arg name="z_init_pose" default="0" />
+    <arg name="yaw_init_pose" default="0"/>
+    <!-- <arg name="roll_init_pose" default="0"/> -->
+    <!-- <arg name="pitch_init_pose" default="0"/> -->
+
+    <!-- Conditionally set xacro_robot based on robot_model -->
+    <arg name="xacro_robot" default="$(eval find('hrii_' + arg('robot_model') + '_description') + '/robots/' + 
+                                     ('rb_kairos_ur5e_oem.urdf.xacro' if arg('robot_model') == 'rb_kairos' else 'moca.urdf.xacro'))" />
+    <!-- <arg name="xacro_robot" default="$(eval find('hrii_' + arg('robot_brand') + '_description') + '/robots/rb_kairos_ur5e_oem.urdf.xacro')"/> -->
+    <!-- <arg name="xacro_robot" default="$(eval find('hrii_' + arg('robot_brand') + '_description') + '/robots/moca.urdf.xacro')"/> -->
+    <!-- <arg name="xacro_robot" default="$(eval find('hrii_' + 'robotnik' + '_description') + '/robots/summit_xls.urdf.xacro')"/> -->
+
+
+    <arg name="launch_rviz" default="true"/>
+    <!-- Conditionally set rviz_config_file based on robot_model -->
+    <arg name="rviz_config_file" default="$(eval find('hrii_person_tracker') + '/rviz/' +
+                                          ('lstm_array_prediction_rbkairos.rviz' if arg('robot_model') == 'rb_kairos' else 'lstm_array_prediction_moca.rviz'))" />
+    <!-- <arg name="rviz_config_file" default="$(find hrii_person_tracker)/rviz/lstm_array_prediction_rbkairos.rviz"/>
+    <arg name="rviz_config_file" default="$(find hrii_person_tracker)/rviz/lstm_array_prediction_moca.rviz"/> -->
+    <!-- <arg name="rviz_config_file" default="$(find hrii_dummy_fsm)/rviz/dummy_mobile_platform_autonomous_navigation.rviz"/> -->
+
+    <!-- Autonomous Navigation Parameters -->
+    <!-- map file path -->
+    <!-- <arg name="map_file_path" value="$(find hrii_person_tracker)/worlds/Crossing/airport.yaml"/> -->
+    <arg name="map_file_path" value="$(find hrii_person_tracker)/worlds/Crossing/Crossing.yaml"/>
+    <!-- <arg name="map_file_path" value="$(find hrii_person_tracker)/worlds/Crossing/Crossing_obstacles.yaml"/> -->
+    <!-- <arg name="map_file_path" value="$(find hrii_gazebo_utils)/maps/machine_tending_docking_station/machine_tending_docking_station.yaml"/> -->
+    <!-- <arg name="map_file_path" value="$(find actor_pos_publish)/maps/office02/map.yaml"/> -->
+    <!-- <arg name="map_file_path" value="$(find hrii_person_tracker)/map/hospital.yaml"/> -->
+    <!-- <arg name="map_file_path" value="$(find hunav_evaluator)/worlds/Passing/passing.yaml"/> -->
+    <!-- <arg name="map_file_path" value="$(find hrii_person_tracker)/map/experiment_room/experiment_room.yaml"/> -->
+    <arg name="merged_scan_topic" default="merged_scan"/>
+
+    <!-- Load robot model-->
+    <include file="$(find hrii_person_tracker)/launch/mobile_base_launcher.xml" pass_all_args="true"/>
+
+    <group ns="$(arg robot_id)">
+
+        <!-- Spawn walls' URDFs in Gazebo -->
+        <!-- <include if="$(eval interface_type == 'SIMULATION')" file="$(find hrii_gazebo_utils)/launch/spawn_machine_tending_docking_station.xml"/>  -->
+        
+        <!-- AMCL and MAP SERVER -->
+        <include file="$(find hrii_localization)/launch/amcl.launch">
+            <arg name="robot_id" value="$(arg robot_id)"/> 
+            <arg name="odom_model_type" value="omni"/>
+            <arg name="use_map_in_hrii_localization_folder" value="false"/>
+            <arg name="map_file_path" value="$(arg map_file_path)"/>
+            <arg name="x_init_pose" value="$(arg x_init_pose)"/>
+            <arg name="y_init_pose" value="$(arg y_init_pose)"/>
+            <arg name="z_init_pose" value="$(arg z_init_pose)"/>
+            <arg name="yaw_init_pose" value="$(arg yaw_init_pose)"/>
+            <arg name="global_frame" value="$(arg robot_id)_map"/>
+            <arg name="odom_frame" value="$(arg robot_id)_odom"/>
+            <arg name="base_frame" value="$(arg robot_id)_base_footprint"/>
+        </include>
+
+        <!-- GMAPPING -->
+        <!-- <include file="$(find hrii_localization)/launch/slam_gmapping.launch">
+            <arg name="robot_id" value="$(arg robot_id)"/> 
+            <arg name="scan_topic" value="front_laser/scan"/>
+        </include> -->
+
+
+        <!-- MOVE_BASE -->
+        <include file="$(find hrii_move_base)/launch/move_base_teb.launch">
+            <arg name="id_robot" value="$(arg robot_id)"/>
+	        <arg name="kinematics" value="omni"/>
+        </include>
+            
+        <!-- FRONT AND REAR LASER SCANNERS MERGER -->
+		<!-- <node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger" output="screen">
+            <param name="destination_frame" value="$(arg robot_id)_front_laser_link"/>
+            <param name="cloud_destination_topic" value="merged_cloud"/>
+            <param name="scan_destination_topic" value="$(arg merged_scan_topic)"/>
+            <param name="laserscan_topics" value ="/$(arg robot_id)/front_laser/scan /$(arg robot_id)/rear_laser/scan" /> 
+            <param name="angle_min" value="-3.14159265359"/>
+            <param name="angle_max" value="3.14159265359"/>
+            <param name="angle_increment" value="0.0058"/>
+            <param name="scan_time" value="0.00436333334073"/>
+            <param name="range_min" value="0.05"/>
+            <param name="range_max" value="10.0"/>
+
+        </node> -->
+
+        <!-- UNPAUSE PHYSICS (give Gazebo some seconds to spawn everything before the physics is enabled) -->
+        <!-- <arg name="delay_time" value="6.0"/>
+	    <node pkg="hrii_person_tracker" type="delay_physics_activation.py" name="delay_physics_activation" launch-prefix="bash -c 'sleep $(arg delay_time); $0 $@' " output="screen" /> -->
+    	
+        <!-- Give Gazebo Actors random targets within the map using A* algorithm -->
+        <!-- <node pkg="actor_pos_publish" type="actor_pos_publish_node" name="actor_pos_publish_node" /> -->
+        <!-- <node pkg="actor_pos_publish" type="actor_pos_publish_node" name="actor_pos_publish_node" launch-prefix="bash -c 'sleep 6.0; $0 $@' "/> -->
+
+    </group>    
+
+    <!-- RISKRRT PLANNER + CONTROLLER (alternative to move_base) -->
+    <!-- <include file="$(find riskrrt)/launch/riskrrt.launch"/> -->
+
+    <!-- LEG TRACKER + LSTM NODES + HUNAV EVALUATOR -->
+    <include file="$(find hrii_person_tracker)/launch/legtracker_lstm_nodes_hunav.launch"/>
+
+    <!-- SEND A GOAL TO THE BASE AS SOON AS GAZEBO STARTS -->
+    <!-- <node pkg="riskrrt" type="send_goal_once" name="send_goal_once"/> -->
+    <!-- <node pkg="simple_navigation_goals" type="simple_navigation_goals_no_movebase" name="simple_navigation_goals_no_movebase"/> -->
+</launch>
+
+        <!-- <param name="scan_topic" value="$(eval arg('robot_id') + '/' + arg('merged_scan_topic'))"/> -->
+        <!-- <param name="scan_topic" value="$(eval arg('robot_id') + '/' + 'front_laser/scan' )"/> -->

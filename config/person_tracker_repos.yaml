@@ -1,0 +1,18 @@
+PROJECT
+git@gitlab.iit.it:hrii/vision/skeleton-tracking/hrii_person_tracker.git: noetic-devel
+DEPENDENCIES
+git@gitlab.iit.it:hrii/general/hrii_utils.git: noetic-devel (7b5f48a)
+git@gitlab.iit.it:hrii/robotics/robotnik/hrii_robotnik.git: noetic-devel (a73b6f9)
+git@gitlab.iit.it:hrii/robotics/universalrobots/hrii_universal_robots.git: noetic-devel (9f5ca70)
+git@gitlab.iit.it:hrii/robotics/common/hrii_robot_interface.git: noetic-devel (cb9f2b5)
+git@gitlab.iit.it:hrii/robotics/common/hrii_robot_msgs.git: noetic-devel (3837d40)
+git@gitlab.iit.it:hrii/general/matlogger2.git: master (a8b2680)
+git@gitlab.iit.it:hrii/robotics/common/hrii_dummy_fsm.git: noetic-devel (eb9c626)
+git@gitlab.iit.it:hrii/general/hrii_gazebo_utils.git: noetic-devel (fea40b6)
+git@gitlab.iit.it:hrii/planning/hrii_trajectory_planner.git: noetic-devel (1336228)
+git@gitlab.iit.it:hrii/robotics/common/hrii_robot_controllers.git: noetic-devel (50d5dca)
+git@gitlab.iit.it:hrii/robotics/moca/hrii_moca.git: noetic-devel (ce50da5)
+git@gitlab.iit.it:hrii/robotics/franka/hrii_franka.git: noetic-devel (046fa21)
+git@gitlab.iit.it:hrii/vision/skeleton-tracking/hrii_leg_tracker.git: person-tracker (5e1108f)
+git@gitlab.iit.it:hrii/robotics/rb_kairos/hrii_rb_kairos.git: person-tracker (9a4c2f5)
+git@gitlab.iit.it:hrii/planning/hrii_navigation.git: person-tracker (eae1802)

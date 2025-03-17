@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- General parameters -->
+    <arg name="interface_type" default="$(optenv INTERFACE_TYPE SIMULATION)"/>
+
+    <!-- General simulation parameters -->
+    <arg name="launch_gazebo_gui" default="true"/>
+    <arg name="launch_gazebo_paused" default="true"/>
+    <arg name="launch_gazebo_world" default="true"/>
+
+    <!-- <env name="GAZEBO_MODEL_PATH" value="$(find hrii_person_tracker)/worlds/Dataset-of-Gazebo-Worlds-Models-and-Maps/worlds/factory/models/:$(optenv GAZEBO_MODEL_PATH)" /> -->
+    <!-- <env name="GAZEBO_MODEL_PATH" value="$(find hrii_person_tracker)/worlds/aws-robomaker-hospital-world/models/:$(optenv GAZEBO_MODEL_PATH)" /> -->
+    <!-- <env name="GAZEBO_MODEL_PATH" value="$(find hrii_person_tracker)/worlds/dynamic_logistics_warehouse/models/:$(optenv GAZEBO_MODEL_PATH)" /> -->
+    <!-- <env name="GAZEBO_MODEL_PATH" value="$(find hrii_person_tracker)/worlds/hunavsim-worlds/models/:$(optenv GAZEBO_MODEL_PATH)" /> -->
+    
+    <!-- <arg name="gazebo_world" value="$(find hunav_evaluator)/worlds/Passing/Passing.world"/> -->
+    <!-- <arg name="gazebo_world" value="$(find hunav_evaluator)/worlds/Crossing/Natta.world"/> -->
+    <!-- <arg name="gazebo_world" value="$(find hunav_evaluator)/worlds/Crossing/Crossing_obstacles.world"/> -->
+    
+
+    <arg name="gazebo_world" value="$(find hunav_evaluator)/worlds/Crossing/Crossing.world"/>
+    <!-- <arg name="gazebo_world" value="$(find hrii_person_tracker)/worlds/Crossing/Crossing.world"/> -->
+
+
+    <!-- <arg name="gazebo_world" value="$(find hrii_person_tracker)/worlds/Crossing/Crossing_obstacles.world"/> -->
+    <!-- <arg name="gazebo_world" value="$(find hrii_person_tracker)/worlds/Crossing/Natta.world"/> -->
+    <!-- <arg name="gazebo_world" value="$(find hrii_person_tracker)/worlds/attacher_world.world"/> -->
+    <!-- <arg name="gazebo_world" value="$(find hrii_person_tracker)/worlds/attacher_world_walking.world"/> -->
+    <!-- <arg name="gazebo_world" value="$(find hrii_person_tracker)/worlds/cafe.world"/> -->
+    <!-- <arg name="gazebo_world" value="$(find hrii_person_tracker)/worlds/willowgarage.world"/> -->
+    <!-- <arg name="gazebo_world" value="$(find hrii_person_tracker)/worlds/Dataset-of-Gazebo-Worlds-Models-and-Maps/worlds/factory/factory.model"/> -->
+    <!-- <arg name="gazebo_world" value="$(find hrii_person_tracker)/worlds/aws-robomaker-hospital-world/worlds/hospital.world"/> -->
+    <!-- <arg name="gazebo_world" value="$(find hrii_person_tracker)/worlds/aws-robomaker-hospital-world/worlds/hospital_modified.world"/> -->
+    <!-- <arg name="gazebo_world" value="$(find hrii_person_tracker)/worlds/dynamic_logistics_warehouse/worlds/warehouse.world"/> -->
+    <!-- <arg name="gazebo_world" value="$(find hrii_person_tracker)/worlds/dynamic_logistics_warehouse/worlds/warehouse_few_models.world"/> -->
+    <!-- <arg name="gazebo_world" value="$(find hrii_person_tracker)/worlds/dynamic_logistics_warehouse/worlds/warehouse_no_actors.world"/> -->
+    
+    <!-- <arg name="gazebo_world" value="$(find gazebo_ros)/worlds/empty.world"/> -->
+    <!-- <arg name="gazebo_world" value="$(find gazebo_ros_actor_plugin)/config/worlds/move_actor.world"/> -->
+    <!-- <arg name="gazebo_world" value="$(find gazebo_ros_actor_plugin)/config/worlds/move_actor.world"/> -->
+    <!-- <arg name="gazebo_world" value="$(find gazebo_world)/world/office02_dynamic_map.world"/> -->
+
+
+    <!-- General robot parameters -->
+    <arg name="robot_model"/>
+    <arg name="robot_id" default="$(optenv ROBOT_ID robot)"/>
+    <arg name="robot_brand" default="$(arg robot_model)"/>
+    
+    <arg name="launch_rviz" default="true"/>
+    <arg name="rviz_config_file" default="$(eval find('hrii_' + arg('robot_brand') + '_description') + '/rviz/' + arg('robot_model') +'.rviz')"/>
+
+    <group ns="$(arg robot_id)">
+        <!-- Load robot interface -->
+        <include file="$(eval find('hrii_' + arg('robot_brand') + '_interface') + '/launch/' + arg('robot_model') +'_interface.launch')" pass_all_args="true"/>
+        <!-- <include file="$(find hrii_person_tracker)/launch/spawner.launch"/> -->
+        
+        <!-- LAUNCH RVIZ -->
+        <node if="$(arg launch_rviz)" name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_config_file)"/>
+    </group>
+
+    <!-- LAUNCH GAZEBO WORLD -->
+    <group if="$(eval interface_type == 'SIMULATION')">
+        <include if="$(arg launch_gazebo_world)" file="$(find gazebo_ros)/launch/empty_world.launch">
+            <arg name="world_name" value="$(arg gazebo_world)"/>
+            <arg name="debug" value="false" />
+            <arg name="paused" value="$(arg launch_gazebo_paused)"/>
+            <arg name="use_sim_time" value="true"/>
+            <arg name="headless" value="false"/>
+            <arg name="gui" value="$(arg launch_gazebo_gui)"/>
+            
+        </include>
+    </group>
+</launch>

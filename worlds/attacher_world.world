@@ -1,0 +1,237 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <!-- A Gazebo links attacher -->
+    <plugin name="ros_link_attacher_plugin" filename="libgazebo_ros_link_attacher.so"/>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground planes -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+
+    <!-- actors still -->
+    <!-- <actor name="actor0">
+      <skin>
+          <filename>stand.dae</filename>
+          <scale>1.0</scale>
+      </skin>
+      <animation name="talk_b">
+          <filename>stand.dae</filename>
+          <scale>1.0</scale>
+      </animation>
+      <script>
+          <loop>true</loop>
+          <auto_start>true</auto_start>
+          <trajectory id="0" type="talk_b">
+              <waypoint>
+                  <time>0</time>
+                  <pose>1 0 0 0 0 0</pose>
+              </waypoint>
+              <waypoint>
+                  <time>5</time>
+                  <pose>1 0 0 0 0 0</pose>
+              </waypoint>
+          </trajectory>
+      </script>
+    </actor> -->
+
+    <!-- ACTORS WALKING ALONG X AXIS -->
+    <actor name="actor0">
+      <skin>
+          <filename>walk.dae</filename>
+          <scale>1.0</scale>
+      </skin>
+      <animation name="talk_b">
+          <filename>walk.dae</filename>
+          <scale>1.0</scale>
+      </animation>
+      <script>
+          <loop>true</loop>
+          <auto_start>true</auto_start>
+          <trajectory id="0" type="talk_b">
+              <waypoint>
+                  <time>0</time>
+                  <pose>5 1 0 0 0 3.14</pose>
+              </waypoint>
+              <waypoint>
+                  <time>15</time>
+                  <pose>-5 1 0 0 0 3.14</pose>
+              </waypoint>
+          </trajectory>
+      </script>
+    </actor>
+
+    <actor name="actor1">
+      <skin>
+          <filename>walk.dae</filename>
+          <scale>1.0</scale>
+      </skin>
+      <animation name="talk_b">
+          <filename>walk.dae</filename>
+          <scale>1.0</scale>
+      </animation>
+      <script>
+          <loop>true</loop>
+          <auto_start>true</auto_start>
+          <trajectory id="0" type="talk_b">
+              <waypoint>
+                  <time>0</time>
+                  <pose>5 -1 0 0 0 3.14</pose>
+              </waypoint>
+              <waypoint>
+                  <time>17</time>
+                  <pose>-5 -1 0 0 0 3.14</pose>
+              </waypoint>
+          </trajectory>
+      </script>
+    </actor>
+
+    <!-- <actor name="actor2">
+      <skin>
+          <filename>walk.dae</filename>
+          <scale>1.0</scale>
+      </skin>
+      <animation name="talk_b">
+          <filename>walk.dae</filename>
+          <scale>1.0</scale>
+      </animation>
+      <script>
+          <loop>true</loop>
+          <auto_start>true</auto_start>
+          <trajectory id="0" type="talk_b">
+              <waypoint>
+                  <time>0</time>
+                  <pose>5 0 0 0 0 3.14</pose>
+              </waypoint>
+              <waypoint>
+                  <time>10</time>
+                  <pose>1 0 0 0 0 3.14</pose>
+              </waypoint>
+          </trajectory>
+      </script>
+    </actor> -->
+
+    <!-- ACTORS WALKING ALONG Y AXIS -->
+    <!-- <actor name="actor_walking_vertically_0">
+      <skin>
+          <filename>stand.dae</filename>
+          <scale>1.0</scale>
+      </skin>
+      <animation name="walking">
+          <filename>walk.dae</filename>
+          <scale>1.0</scale>
+          <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+          <loop>true</loop>
+          <auto_start>true</auto_start>
+          <trajectory id="0" type="walking">
+           <waypoint>
+                <time>0</time>
+                <pose>2 -4 0 0 0 1.95</pose>
+            </waypoint>
+            <waypoint>
+                <time>14</time>
+                <pose>2 6 0 0 0 1.95</pose>
+            </waypoint>
+          </trajectory>
+      </script>
+    </actor>
+    <actor name="actor_walking_vertically_1">
+      <skin>
+          <filename>stand.dae</filename>
+          <scale>1.0</scale>
+      </skin>
+      <animation name="walking">
+          <filename>walk.dae</filename>
+          <scale>1.0</scale>
+          <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+          <loop>true</loop>
+          <auto_start>true</auto_start>
+          <trajectory id="0" type="walking">
+           <waypoint>
+                <time>0</time>
+                <pose>1 -4 0 0 0 1.95</pose>
+            </waypoint>
+            <waypoint>
+                <time>15</time>
+                <pose>1 6 0 0 0 1.95</pose>
+            </waypoint>
+          </trajectory>
+      </script>
+    </actor> -->
+
+    <!-- ACTOR WALKING DIAGONALLY -->
+    <!-- <actor name="actor_talking">
+      <skin>
+          <filename>stand.dae</filename>
+          <scale>1.0</scale>
+      </skin>
+      <animation name="walking">
+          <filename>walk.dae</filename>
+          <scale>1.0</scale>
+          <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+          <loop>true</loop>
+          <auto_start>true</auto_start>
+          <trajectory id="0" type="walking">
+           <waypoint>
+                <time>0</time>
+                <pose>3 -2 0 0 0 1.95</pose>
+            </waypoint>
+            <waypoint>
+                <time>12</time>
+                <pose>0 5.5 0 0 0 1.95</pose>
+            </waypoint>
+          </trajectory>
+      </script>
+    </actor> -->
+
+    <!-- actors with plugin libMapActorPlugin -->
+    <!-- <actor name="actor0">
+      <pose>1 3 1.2138 0 0 0</pose>
+      <skin>
+        <filename>walk.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name="walking">
+        <filename>walk.dae</filename>
+        <scale>1.000000</scale>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+
+      <plugin name="actor0_plugin" filename="/root/ros_ws/src/Gazebo-Map-Actor-Plugin/actor_move/build/libMapActorPlugin.so">
+        <namespace>rbkairos</namespace>
+        <target>0 -5 1.2138</target>
+        <animation_factor>5.1</animation_factor>
+      </plugin>
+    </actor>
+
+    <actor name="actor1">
+      <pose>0 -2 1.2138 0 0 0</pose>
+      <skin>
+        <filename>walk.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name="walking">
+        <filename>walk.dae</filename>
+        <scale>1.000000</scale>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+
+      <plugin name="actor1_plugin" filename="/root/ros_ws/src/Gazebo-Map-Actor-Plugin/actor_move/build/libMapActorPlugin.so">
+        <namespace>rbkairos</namespace>
+        <target>0 -5 1.2138</target>
+        <animation_factor>5.1</animation_factor>
+      </plugin>
+    </actor> -->
+
+
+  </world>
+</sdf>

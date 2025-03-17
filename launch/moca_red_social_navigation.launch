@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<launch>
+
+        <!-- SUMMIT XL STEEL-->
+        <arg name="omni_dir" default="true"/>
+        <arg name="amcl_and_mapserver_a" default="true"/>
+        <arg name="whole_body" default="true"/>
+
+        <!--robot namespace -->
+        <arg name="robot_id" default="moca_red"/>
+
+        <!-- amcl initial pose -->
+        <arg name="x_init_pose" default="0" />
+        <arg name="y_init_pose" default="0" />
+        <arg name="z_init_pose" default="0" />
+        <arg name="yaw_init_pose" default="0" />
+
+        <group ns="$(arg robot_id)">
+
+            <arg name="prefix" value="$(arg robot_id)_"/>
+
+            <!-- move base -->
+            <include file="$(find hrii_move_base)/launch/move_base_teb.launch">
+                <arg name="id_robot" value="$(arg robot_id)"/>
+	            <arg name="kinematics" value="omni"/>
+                <arg name="cmd_vel_topic" default="robotnik_base_control/cmd_vel"/>
+            </include>
+
+            <!-- Run AMCL and Map Server -->
+            <arg name="map_file_path" default="$(find hrii_person_tracker)/map/experiment_room/experiment_room.yaml"/>
+            <include file="$(find hrii_localization)/launch/amcl.launch">
+                <arg name="robot_id" value="$(arg robot_id)"/> 
+                <arg name="odom_model_type" value="omni"/>
+                <arg name="use_map_in_hrii_localization_folder" value="false"/>
+                <arg name="map_file_path" value="$(arg map_file_path)"/>
+                <arg name="x_init_pose" value="$(arg x_init_pose)"/>
+                <arg name="y_init_pose" value="$(arg y_init_pose)"/>
+                <arg name="z_init_pose" value="$(arg z_init_pose)"/>
+                <arg name="yaw_init_pose" value="$(arg yaw_init_pose)"/>
+                <arg name="global_frame" value="$(arg robot_id)_map"/>
+                <arg name="odom_frame" value="$(arg robot_id)_odom"/>
+                <arg name="base_frame" value="$(arg robot_id)_base_footprint"/>
+            </include>
+
+            <!-- <arg name="xacro_robot" default="$(find hrii_robotnik_description)/robots/summit_xls_std.urdf.xacro" />
+            <param name="robot_description" command="$(find xacro)/xacro $(arg xacro_robot)"/> -->
+            <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen"/> -->
+
+
+        </group>
+
+
+</launch>
+
+
